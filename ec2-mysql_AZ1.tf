@@ -50,10 +50,16 @@ locals {
   private_ips = ["172.16.0.132", "172.16.0.133", "172.16.0.134"]
 }
 
+variable "privateIpsAZ1" {
+  type        = list(string)
+  description = "CIDR blocks for private subnets"
+  default     = ["172.16.0.132", "172.16.0.133", "172.16.0.134"]
+}
+
 resource "aws_network_interface" "CyberSecurityPrivateInterfaceAZ1" {
   count           = 3
   subnet_id       = element(aws_subnet.private_subnets, 0).id
-  private_ips     = [local.private_ips[count.index]]
+  private_ips     = [var.privateIpsAZ1[count.index]]
   security_groups = [
     aws_security_group.CyberSecurityMysqlSGAZ1.id,
     aws_security_group.CyberSecuritySshSGAZ1.id
@@ -66,7 +72,7 @@ resource "aws_network_interface" "CyberSecurityPrivateInterfaceAZ1" {
 
 resource "aws_eip" "CyberSecurityMysqlEIPAZ1" {
   count = 3
-  associate_with_private_ip = local.private_ips[count.index]
+  associate_with_private_ip = var.privateIpsAZ1[count.index]
 
   tags = {
     Name = "CyberSecurityMysqlEIPAZ1-${count.index + 1}"
