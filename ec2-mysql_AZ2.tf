@@ -44,12 +44,12 @@ resource "aws_security_group" "CyberSecuritySshSGAZ2" {
   }
 }
 
-resource "aws_eip" "CyberSecurityEIPAZ2" {
+resource "aws_eip" "CyberSecurityMysqlEIPAZ2" {
   associate_with_private_ip = true
 }
 
 resource "aws_eip_association" "CyberSecurityMysqlEIPAssociationAZ2" {
-  allocation_id        = aws_eip.CyberSecurityEIPAZ2.id
+  allocation_id        = aws_eip.CyberSecurityMysqlEIPAZ2.id
   network_interface_id = aws_network_interface.CyberSecurityPrivateInterfaceAZ2.id
 }
 
