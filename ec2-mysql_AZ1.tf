@@ -6,7 +6,7 @@ resource "aws_security_group" "CyberSecurityMysqlSGAZ1" {
     from_port   = 33306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["${aws_instance.CyberSecurityInstanceWordPressAZ1}/32"]
+    cidr_blocks = ["${aws_instance.CyberSecurityInstanceWordPressAZ1.private_ip}/32"]
   }
 
   egress {
@@ -29,7 +29,7 @@ resource "aws_security_group" "CyberSecuritySshSGAZ1" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${aws_instance.CyberSecurityInstanceWordPressAZ1}/32"]
+    cidr_blocks = ["${aws_instance.CyberSecurityInstanceWordPressAZ1.private_ip}/32"]
   }
 
   egress {
