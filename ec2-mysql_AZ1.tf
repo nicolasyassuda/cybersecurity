@@ -2,11 +2,12 @@ resource "aws_security_group" "CyberSecurityMysqlSGAZ1" {
   name        = "mysql-AZ1-sg"
   description = "Allow MySQL access"
   vpc_id      = aws_vpc.CyberSecurityVPC.id
+
   ingress {
-    from_port   = 33306
+    from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["${aws_instance.CyberSecurityInstanceWordPressAZ1.private_ip}/32"]
+    cidr_blocks = ["172.16.0.0/26"]
   }
 
   egress {
@@ -23,13 +24,14 @@ resource "aws_security_group" "CyberSecurityMysqlSGAZ1" {
 
 resource "aws_security_group" "CyberSecuritySshSGAZ1" {
   name        = "ssh-accessmysqlAZ1-sg"
-  description = "Allow SSH and HTTP/HTTPS access"
+  description = "Allow SSH access"
   vpc_id      = aws_vpc.CyberSecurityVPC.id
+
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${aws_instance.CyberSecurityInstanceWordPressAZ1.private_ip}/32"]
+    cidr_blocks = ["0.0.0.0/0"] # or your IP
   }
 
   egress {
@@ -44,36 +46,47 @@ resource "aws_security_group" "CyberSecuritySshSGAZ1" {
   }
 }
 
-resource "aws_eip" "CyberSecurityMysqlEIPAZ1" {
-  associate_with_private_ip = true
-}
-
-resource "aws_eip_association" "CyberSecurityMysqlEIPAssociationAZ1" {
-  allocation_id        = aws_eip.CyberSecurityMysqlEIPAZ1.id
-  network_interface_id = aws_network_interface.CyberSecurityPrivateInterfaceAZ1.id
+locals {
+  private_ips = ["172.16.0.132", "172.16.0.133", "172.16.0.134"]
 }
 
 resource "aws_network_interface" "CyberSecurityPrivateInterfaceAZ1" {
-  subnet_id   = element(aws_subnet.private_subnets,0).id
-  private_ips = ["172.16.0.132","172.16.0.133","172.16.0.134"]
-  security_groups = [aws_security_group.CyberSecurityMysqlSGAZ1.id, aws_security_group.CyberSecuritySshSGAZ1.id]
+  count           = 3
+  subnet_id       = element(aws_subnet.private_subnets, 0).id
+  private_ips     = [local.private_ips[count.index]]
+  security_groups = [
+    aws_security_group.CyberSecurityMysqlSGAZ1.id,
+    aws_security_group.CyberSecuritySshSGAZ1.id
+  ]
 
   tags = {
-    Name = "CyberSecurityPrivateInterfaceAZ1"
+    Name = "CyberSecurityPrivateInterfaceAZ1-${count.index + 1}"
   }
 }
 
-resource "aws_instance" "CyberSecurityInstanceMysql_1_AZ1" {
-  ami                    = "ami-04b4f1a9cf54c11d0"
-  instance_type          = "t2.micro"
-  key_name = aws_key_pair.CyberSecurityKeyPair.key_name
+resource "aws_eip" "CyberSecurityMysqlEIPAZ1" {
+  count = 3
+  associate_with_private_ip = local.private_ips[count.index]
 
   tags = {
-    Name = "CyberSecurityInstanceMysqlAZ1"
+    Name = "CyberSecurityMysqlEIPAZ1-${count.index + 1}"
   }
+}
+
+resource "aws_eip_association" "CyberSecurityMysqlEIPAssociationAZ1" {
+  count                = 3
+  allocation_id        = aws_eip.CyberSecurityMysqlEIPAZ1[count.index].id
+  network_interface_id = aws_network_interface.CyberSecurityPrivateInterfaceAZ1[count.index].id
+}
+
+resource "aws_instance" "CyberSecurityInstanceMysqlAZ1" {
+  count           = 3
+  ami             = "ami-04b4f1a9cf54c11d0"
+  instance_type   = "t2.micro"
+  key_name        = aws_key_pair.CyberSecurityKeyPair.key_name
 
   network_interface {
-    network_interface_id = aws_network_interface.CyberSecurityPrivateInterfaceAZ1.id
+    network_interface_id = aws_network_interface.CyberSecurityPrivateInterfaceAZ1[count.index].id
     device_index         = 0
   }
 
@@ -81,44 +94,8 @@ resource "aws_instance" "CyberSecurityInstanceMysql_1_AZ1" {
               #!/bin/bash
               sudo apt update -y
               EOF
-}
-
-resource "aws_instance" "CyberSecurityInstanceMysql_2_AZ1" {
-  ami                    = "ami-04b4f1a9cf54c11d0"
-  instance_type          = "t2.micro"
-  key_name = aws_key_pair.CyberSecurityKeyPair.key_name
 
   tags = {
-    Name = "CyberSecurityInstanceMysqlAZ1"
+    Name = "CyberSecurityInstanceMysqlAZ1-${count.index + 1}"
   }
-
-  network_interface {
-    network_interface_id = aws_network_interface.CyberSecurityPrivateInterfaceAZ1.id
-    device_index         = 1
-  }
-
-  user_data = <<-EOF
-              #!/bin/bash
-              sudo apt update -y
-              EOF
-}
-
-resource "aws_instance" "CyberSecurityInstanceMysql_3_AZ1" {
-  ami                    = "ami-04b4f1a9cf54c11d0"
-  instance_type          = "t2.micro"
-  key_name = aws_key_pair.CyberSecurityKeyPair.key_name
-
-  tags = {
-    Name = "CyberSecurityInstanceMysqlAZ1"
-  }
-
-  network_interface {
-    network_interface_id = aws_network_interface.CyberSecurityPrivateInterfaceAZ1.id
-    device_index         = 2
-  }
-
-  user_data = <<-EOF
-              #!/bin/bash
-              sudo apt update -y
-              EOF
 }
