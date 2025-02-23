@@ -1,5 +1,5 @@
 resource "aws_security_group" "CyberSecurityMysqlSGAZ1" {
-  name        = "mysql-access-sg"
+  name        = "mysql-AZ1-sg"
   description = "Allow MySQL access"
   vpc_id      = aws_vpc.CyberSecurityVPC.id
   ingress {
@@ -22,7 +22,7 @@ resource "aws_security_group" "CyberSecurityMysqlSGAZ1" {
 }
 
 resource "aws_security_group" "CyberSecuritySshSGAZ1" {
-  name        = "ssh-access-sg"
+  name        = "ssh-accessmysqlAZ1-sg"
   description = "Allow SSH and HTTP/HTTPS access"
   vpc_id      = aws_vpc.CyberSecurityVPC.id
   ingress {
