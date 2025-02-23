@@ -35,11 +35,6 @@ resource "aws_security_group" "CyberSecuritySG" {
     Name = "SSH-Security-Group"
   }
 }
-resource "aws_key_pair" "CyberSecurityKeyPair" {
-  key_name   = "CyberSecurityKeyPair"
-  public_key = file("/home/nicolasyassuda/.ssh/my-ec2-key.pub")
-}
-
 resource "aws_eip" "CyberSecurityEIPAZ1" {
   associate_with_private_ip = true
 }

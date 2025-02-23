@@ -43,16 +43,12 @@ resource "aws_security_group" "CyberSecuritySshSGAZ1" {
     Name = "SSH-Security-Group"
   }
 }
-resource "aws_key_pair" "CyberSecurityKeyPair" {
-  key_name   = "CyberSecurityKeyPair"
-  public_key = file("/home/nicolasyassuda/.ssh/my-ec2-key.pub")
-}
 
 resource "aws_eip" "CyberSecurityEIPAZ1" {
   associate_with_private_ip = true
 }
 
-resource "aws_eip_association" "CyberSecurityEIPAssociationAZ1" {
+resource "aws_eip_association" "CyberSecurityMysqlEIPAssociationAZ1" {
   allocation_id        = aws_eip.CyberSecurityEIPAZ1.id
   network_interface_id = aws_network_interface.CyberSecurityPrivateInterfaceAZ1.id
 }
