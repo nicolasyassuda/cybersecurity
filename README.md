@@ -131,6 +131,12 @@ Para aumentar a segurança da instância WordPress, foram configuradas regras no
 6. **Proteção à Área Administrativa** 🔐:
    - Regras foram configuradas para limitar tentativas de login múltiplas ou suspeitas na página `/wp-admin`.
 
+![image](https://github.com/user-attachments/assets/d20597d8-3f01-4c40-805d-270c27040277)
+Bloqueios para multiplas ameaças via configuração de um WAF.
+
+![image](https://github.com/user-attachments/assets/854cd615-581a-4ee3-9afe-c02f2849c85d)
+Bloqueio de brute-force nas rotas de admin.
+
 Essas configurações garantem que o servidor WordPress esteja protegido contra ameaças comuns e ataques automatizados.
 
 ### Configuração do WordPress 🌐📝
