@@ -1,7 +1,3 @@
-Claro! Vou adicionar alguns ícones ao README para torná-lo mais visual e divertido, sem perder a seriedade do conteúdo. Aqui está a versão atualizada com ícones:
-
----
-
 # 🛡️ Cybersecurity Repository README
 
 ## 📚 Descrição do Projeto
